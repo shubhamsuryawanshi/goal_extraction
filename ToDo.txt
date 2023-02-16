@@ -1,0 +1,3 @@
+1. Curate a more balanced dataset
+2. Review reports from a variety of sources as opposed to reports from same company
+3. Try to implement the pipeline with lighter models.
