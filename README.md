@@ -14,16 +14,13 @@ Generally, goals statements constitute the pattern wherein the organization(comp
 
 The initial 3 stages used for NLP preprocessing for ESG goal extraction would use 2 open-sourced pretrained transformer model-based pipelines.
 
-1. stage – Coreference pipeline  
+* First stage – Coreference pipeline  
 This experimental pipeline encompasses two prime components:   
 a. CoreferenceResolver – An LSTM over the RoBERTa base transfomer model.  
 b. SpanResolver – A lightweight CNN with two output channels. 
 
-2. stage – English core transformer pipeline  
-Named Entity Recognition
+* Second and Third stage – English core transformer pipeline  
+Named Entity Recognition and POS tagging
 
-3. stage – English core transformer pipeline  
-POS tagging
-
-4. stage – Fine-tuned BERT model  
+* Fourth stage – Fine-tuned BERT model  
 An annotated dataset was created from ESG report from multiple DAX100 companies to fine-tune a pre-trained model.
