@@ -2,6 +2,7 @@
 import spacy
 import PyPDF2
 import sys
+import os
 import pandas as pd
 import numpy as np
 import torch
@@ -35,9 +36,11 @@ def resolve_references(doc):
         val for key, val in doc.spans.items() if key.startswith('coref_cluster')
     ]
 
+    # Iterating through each cluster
     for cluster in clusters:
         first_mention = cluster[0]
 
+        # Marking spans for references
         for mention_span in list(cluster)[1:]:
             if len(mention_span) == 0:
                 continue
@@ -48,6 +51,7 @@ def resolve_references(doc):
                 for token in mention_span[1:]:
                     token_mention_mapper[token.idx] = ''
 
+    # Recreating sentences after resolution
     for token in doc:
         if token.idx in token_mention_mapper:
             output_string += token_mention_mapper[token.idx]
@@ -58,6 +62,8 @@ def resolve_references(doc):
 
 # Defining central pipeline for extracting goals
 def extract_goals(input_text):
+    global s
+    
     # First stage - Coreference Resolution
     coref_model = spacy.load('en_coreference_web_trf')
     coref_model.max_length = 2000000
@@ -77,9 +83,13 @@ def extract_goals(input_text):
     action_statements = list()
     flag = False
     list_of_sent = list(doc.sents)
+    
+    # Iterating through each sentence, to check if its an action statement
     for sent in list_of_sent:
         flag = False
         sent = list(sent)
+        
+        # Checking if an orgnaization is followed by an action word
         for word in sent:
             if word.ent_type_ == 'ORG':
                 location = sent.index(word)
@@ -99,10 +109,16 @@ def extract_goals(input_text):
                 ):
                     flag = True
                     break
+
+        # If action statement is found its collected
         if flag:
             str_sent = list(map(lambda x: str(x), sent))
             action_statements.append(' '.join(str_sent).replace(' - ', ' '))
 
+    # Additional info to be added in the report
+    s += f'Total no. of action statements: {len(action_statements)}'+'\n'
+    s += f'Total no. of sentences: {len(list_of_sent)}'+'\n\n'
+    
     # Manual garbage collection
     del spacy_core, doc
     
@@ -132,63 +148,102 @@ def extract_goals(input_text):
 
     # Getting index of action statments which we predicted as goals
     goal_indices = list(y_pred[y_pred==1].index)
-
+    
+    # Preparing list of goals to be returned
     goals = list()
     for i in goal_indices:
         goals.append(action_statements[i])
     return goals
+
+# Starting point of the script when executed as a program
+if __name__ == "__main__":
+    # Getting the mode from CLI arguments
+    mode = sys.argv[1]
+
+    # Interactive mode
+    if mode == 'i':
+        # Joining the CLI argument
+        input_text = ' '.join(sys.argv[2:])
+
+        # Running the complete goal extraction pipeline
+        s = ''''''
+        goals = extract_goals(input_text)
+        
+        # Constructing output file
+        n = 0
+        for i in goals:
+            n += 1
+            s += f'Goal {n}: ' + '\n'
+            s += i + '\n'
+        s = f'Total no. of goals extracted: {n}' + '\n' + s
+
+        # Write to output file
+        with open('output/temp.txt', 'w') as f:
+            f.write(s)
+
+    # PDF file mode 
+    elif mode == 'f':
+        # Reading the pdf file from CLI argument
+        file_path = sys.argv[2]
+        reader = PyPDF2.PdfReader(file_path)
+        input_text = ''
+        for i in reader.pages:
+            input_text += i.extract_text()
+        input_text = input_text.replace('\n', ' ')
+        
+        # Running the complete goal extraction pipeline
+        s = ''''''
+        goals = extract_goals(input_text)
+        
+        # Constructing output file
+        n = 0
+        for i in goals:
+            n += 1
+            s += f'Goal {n}: ' + '\n'
+            s += i + '\n'
+        s = f'Total no. of goals extracted: {n}' + '\n\n' + s
+
+        # Write to output file
+        with open('output/temp.txt', 'w') as f:
+            f.write(s)
     
-# Getting the mode from CLI arguments
-mode = sys.argv[1]
+    elif mode == 'd':
+        # Scanning files in the given directory
+        dir_path = sys.argv[2]
+        list_of_all_file = os.listdir(dir_path)
+        
+        # Ignoring files that are not pdf
+        for i in list_of_all_file:
+            if not i.endswith('.pdf'):
+                list_of_all_file.remove(i)
+        
+        print(f'Reading files: {list_of_all_file}')
 
-# Interactive mode
-if mode == 's':
-    # Joining the CLI argument
-    input_text = ' '.join(sys.argv[2:])
+        # Reading from each pdf in the directory
+        for i in list_of_all_file:
+            file_path = dir_path+'/'+i
+            reader = PyPDF2.PdfReader(file_path)
+            input_text = ''
+            for j in reader.pages:
+                input_text += j.extract_text()
+            input_text = input_text.replace('\n', ' ')
+            
+            # Running the complete goal extraction pipeline
+            s = ''''''
+            goals = extract_goals(input_text)
+            
+            # Constructing output file
+            n = 0
+            for j in goals:
+                n += 1
+                s += f'Goal {n}: ' + '\n'
+                s += j + '\n'
+            s = f'Total no. of goals extracted: {n}' + '\n\n' + s
 
-    # Running the complete goal extraction pipeline
-    goals = extract_goals(input_text)
-    
-    # Constructing output file
-    n = 0
-    s = ''''''
-    for i in goals:
-        n += 1
-        s += f'Goal {n}: ' + '\n'
-        s += i + '\n'
-        s += '' + '\n'
-    s += f'Total no. of goals extracted: {n}' + '\n'
+            # Write to output file
+            with open('output/'+i[:-4]+'_result.txt', 'w') as f:
+                f.write(s)
 
-    # Write to output file
-    with open('output/temp.txt', 'w') as f:
-        f.write(s)
-
-# PDF file mode 
-elif mode == 'p':
-    # Reading the pdf file from CLI argument
-    reader = PyPDF2.PdfReader(sys.argv[2])
-    input_text = ''
-    for i in reader.pages:
-        input_text += i.extract_text()
-    input_text = input_text.replace('\n', ' ')
-    
-    # Running the complete goal extraction pipeline
-    goals = extract_goals(input_text)
-    
-    # Constructing output file
-    n = 0
-    s = ''''''
-    for i in goals:
-        n += 1
-        s += f'Goal {n}: ' + '\n'
-        s += i + '\n'
-        s += '' + '\n'
-    s += f'Total no. of goals extracted: {n}' + '\n'
-
-    # Write to output file
-    with open('output/temp.txt', 'w') as f:
-        f.write(s)
-
-# In case of invalid input
-else:
-    print(f'invalid input method')
+    # In case of invalid input
+    else:
+        print(f'invalid input method')
