@@ -210,17 +210,17 @@ if __name__ == "__main__":
     elif mode == 'd':
         # Scanning files in the given directory
         dir_path = sys.argv[2]
-        list_of_all_file = os.listdir(dir_path)
+        list_of_all_files = os.listdir(dir_path)
         
         # Ignoring files that are not pdf
-        for i in list_of_all_file:
+        for i in list_of_all_files:
             if not i.endswith('.pdf'):
-                list_of_all_file.remove(i)
+                list_of_all_files.remove(i)
         
-        print(f'Reading files: {list_of_all_file}')
+        print(f'Reading files: {list_of_all_files}')
 
         # Reading from each pdf in the directory
-        for i in list_of_all_file:
+        for i in list_of_all_files:
             file_path = dir_path+'/'+i
             reader = PyPDF2.PdfReader(file_path)
             input_text = ''
