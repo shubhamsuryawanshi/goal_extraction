@@ -16,3 +16,15 @@ Named Entity Recognition and POS tagging
 
 * Fourth stage – Fine-tuned BERT model  
 An annotated dataset was created from ESG report from multiple DAX100 companies to fine-tune a pre-trained model.
+
+
+---
+
+To run the application
+
+1. Create a python virtual environment  
+    ```python -m venv <virtual environment name>```
+2. Install modules from requirements.txt  
+    ```pip install -r requirements.txt```
+3. Run the application in desired mode  
+    ```python goal_extraction_script i Bosch aims to reduce carbon emission by 2050```

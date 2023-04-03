@@ -135,7 +135,7 @@ def extract_goals(input_text):
     test_dataset = Dataset(action_statements_tokenized)
 
     # Loading fine-tuned BERT model
-    model_path = 'models/mar11/checkpoint-180'
+    model_path = 'models/mar29/checkpoint-160'
     model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=2)
     test_trainer = Trainer(model)
 

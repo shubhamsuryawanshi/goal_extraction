@@ -1,0 +1,11 @@
+coreference resolution image - https://nlp.stanford.edu/projects/coref.shtml
+
+
+bert - https://arxiv.org/abs/1810.04805
+
+coreference mode -https://huggingface.co/spacy/en_core_web_trf
+
+spacy core - https://spacy.io/models/en#en_core_web_trf
+
+huggingface - https://huggingface.co
+trainer api - https://huggingface.co/docs/transformers/v4.27.2/en/main_classes/trainer#transformers.Trainer
