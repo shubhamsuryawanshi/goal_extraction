@@ -21,10 +21,10 @@ An annotated dataset was created from ESG report from multiple DAX100 companies 
 ---
 
 To run the application
-
-1. Create a python virtual environment  
+1. Download the model from the shared onedrive folder (FRA-UAS > Lehre > Sustainability Monitor > ESG Goals Extraction)
+2. Create a python virtual environment  
     ```python -m venv <virtual environment name>```
-2. Install modules from requirements.txt  
+3. Install modules from requirements.txt  
     ```pip install -r requirements.txt```
-3. Run the application in desired mode  
+4. Run the application in desired mode  
     ```python goal_extraction_script i Bosch aims to reduce carbon emission by 2050```
